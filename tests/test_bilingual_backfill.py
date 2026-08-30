@@ -4,6 +4,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from tests.symlink_test_support import symlink_or_skip
+
 
 ROOT = Path(__file__).resolve().parents[1]
 import sys
@@ -41,7 +43,9 @@ class BilingualBackfillTests(unittest.TestCase):
             (outside_package / "proposal.md").write_text("outside", encoding="utf-8")
             outside_manifest = outside_package / "manifest.json"
             outside_manifest.write_text('{"files": []}\n', encoding="utf-8")
-            (submissions / "alice" / "linked-package").symlink_to(
+            symlink_or_skip(
+                self,
+                submissions / "alice" / "linked-package",
                 outside_package,
                 target_is_directory=True,
             )
@@ -72,7 +76,12 @@ class BilingualBackfillTests(unittest.TestCase):
             package = outside / "alice" / "sample"
             package.mkdir(parents=True)
             (package / "proposal.md").write_text("outside", encoding="utf-8")
-            (root / "submissions").symlink_to(outside, target_is_directory=True)
+            symlink_or_skip(
+                self,
+                root / "submissions",
+                outside,
+                target_is_directory=True,
+            )
 
             with self.assertRaisesRegex(ValueError, "submissions root must not be a symbolic link"):
                 submission_dirs(root, [])

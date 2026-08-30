@@ -5,6 +5,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from tests.symlink_test_support import symlink_or_skip
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
@@ -480,7 +482,12 @@ English content [source:SITE-PACKAGE] [standard:STD-001] [depth:DEPTH-001]
             (submission_dir / "proposal.md").write_text("# Sample\n", encoding="utf-8")
             outside = root / "outside"
             outside.mkdir()
-            (submission_dir / "report").symlink_to(outside, target_is_directory=True)
+            symlink_or_skip(
+                self,
+                submission_dir / "report",
+                outside,
+                target_is_directory=True,
+            )
 
             completed = subprocess.run(
                 [sys.executable, str(REPO_ROOT / "scripts" / "render_proposal_html.py"), str(submission_dir)],
@@ -523,7 +530,7 @@ English content [source:SITE-PACKAGE] [standard:STD-001] [depth:DEPTH-001]
             submission_dir.mkdir()
             outside = root / "outside.md"
             outside.write_text("# External\n", encoding="utf-8")
-            (submission_dir / "proposal.md").symlink_to(outside)
+            symlink_or_skip(self, submission_dir / "proposal.md", outside)
 
             completed = subprocess.run(
                 [sys.executable, str(REPO_ROOT / "scripts" / "render_proposal_html.py"), str(submission_dir)],

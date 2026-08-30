@@ -6,6 +6,8 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+from tests.symlink_test_support import symlink_or_skip
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
@@ -163,7 +165,7 @@ class SvgAssetSafetyTests(unittest.TestCase):
             root = Path(tmp)
             submission = write_svg(root, f'<svg xmlns="{SVG_NS}"/>', "real.svg")
             linked = submission / "visual" / "assets" / "linked.svg"
-            linked.symlink_to(root / "outside.svg")
+            symlink_or_skip(self, linked, root / "outside.svg")
             issues = visual_svg_asset_issues(submission)
             self.assertIn(
                 ("visual/assets/linked.svg", "visual SVG asset paths must not use symbolic links"),
@@ -180,7 +182,7 @@ class SvgAssetSafetyTests(unittest.TestCase):
                 f'<svg xmlns="{SVG_NS}"><script/></svg>', encoding="utf-8"
             )
             linked = submission / "visual" / "assets" / "linked"
-            linked.symlink_to(outside, target_is_directory=True)
+            symlink_or_skip(self, linked, outside, target_is_directory=True)
             issues = visual_svg_asset_issues(submission)
             self.assertIn(
                 ("visual/assets/linked", "visual SVG asset paths must not use symbolic links"),

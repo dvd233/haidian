@@ -8,6 +8,8 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+from tests.symlink_test_support import symlink_or_skip
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
@@ -190,7 +192,7 @@ class GitBlobHashTests(unittest.TestCase):
             package.mkdir(parents=True)
             target = package / "target.md"
             target.write_text("safe bytes\n", encoding="utf-8")
-            (package / "proposal.md").symlink_to(target.name)
+            symlink_or_skip(self, package / "proposal.md", target.name)
             (package / "manifest.json").write_text(
                 json.dumps(
                     {

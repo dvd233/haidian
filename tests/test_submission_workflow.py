@@ -15,6 +15,8 @@ from unittest.mock import MagicMock, call, patch
 
 import jsonschema
 
+from tests.symlink_test_support import symlink_or_skip
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
@@ -2064,7 +2066,7 @@ class SubmissionWorkflowTests(unittest.TestCase):
             outside_manifest = root / "outside-manifest.json"
             outside_manifest.write_bytes(manifest_path.read_bytes())
             manifest_path.unlink()
-            manifest_path.symlink_to(outside_manifest)
+            symlink_or_skip(self, manifest_path, outside_manifest)
 
             report = validate_submission(root, "alice", [f"{base}/proposal.md"])
 
@@ -2082,7 +2084,12 @@ class SubmissionWorkflowTests(unittest.TestCase):
             visual_dir = root / base / "visual"
             outside_visual_dir = root / "outside-visual"
             visual_dir.rename(outside_visual_dir)
-            visual_dir.symlink_to(outside_visual_dir, target_is_directory=True)
+            symlink_or_skip(
+                self,
+                visual_dir,
+                outside_visual_dir,
+                target_is_directory=True,
+            )
 
             report = validate_submission(root, "alice", [f"{base}/proposal.md"])
 
